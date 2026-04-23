@@ -38,3 +38,6 @@ build/
 Thumbs.db
 
 application.properties
+
+### Firebase ###
+**/firebase-service-account.json
