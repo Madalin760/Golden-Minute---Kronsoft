@@ -24,7 +24,7 @@ public class DataLoader implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        //aedRepository.deleteAll();
+        aedRepository.deleteAll();
 
         if (aedRepository.count() == 0) {
             System.out.println("Baza de date este goala. Incepem importul fișierului aeds_oficial.json...");
@@ -35,34 +35,38 @@ public class DataLoader implements CommandLineRunner {
 
             // Citim tot JSON-ul
             JsonNode rootNode = mapper.readTree(inputStream);
-            JsonNode onArray = rootNode.get("On");
-
             List<Aed> aedsToSave = new ArrayList<>();
+            for (String key : new String[] { "On", "Off", "On112", "Off112" }) {
+                JsonNode onArray = rootNode.get(key);
 
-            if (onArray != null && onArray.isArray()) {
-                for (JsonNode node : onArray) {
-                    Aed aed = new Aed();
+                if (onArray != null && onArray.isArray()) {
+                    for (JsonNode node : onArray) {
+                        Aed aed = new Aed();
 
-                    // Extragem doar datele care ne intereseaza
-                    aed.setName(node.get("titlu").asText());
-                    aed.setAddress(node.get("adresa").asText());
+                        // Extragem doar datele care ne intereseaza
+                        aed.setName(node.get("titlu").asText());
+                        aed.setAddress(node.get("adresa").asText());
 
-                    // Coordonatele sunt trecute cu ghilimele (String) în JSON, asa că le transformam în numere (Double)
-                    try {
-                        aed.setLatitude(Double.parseDouble(node.get("latitudine").asText()));
-                        aed.setLongitude(Double.parseDouble(node.get("longitudine").asText()));
-                        aedsToSave.add(aed);
-                    } catch (Exception e) {
-                        // Daca un rand nu are coordonate corecte, il ignoram pentru a nu bloca aplicatia
+                        // Coordonatele sunt trecute cu ghilimele (String) în JSON, asa că le
+                        // transformam în numere (Double)
+                        try {
+                            aed.setLatitude(Double.parseDouble(node.get("latitudine").asText()));
+                            aed.setLongitude(Double.parseDouble(node.get("longitudine").asText()));
+                            aedsToSave.add(aed);
+                        } catch (Exception e) {
+                            // Daca un rand nu are coordonate corecte, il ignoram pentru a nu bloca
+                            // aplicatia
+                        }
                     }
                 }
             }
-
             // Salvam toate cele mii de puncte în PostgreSQL dintr-o singura mișcare
             aedRepository.saveAll(aedsToSave);
-            System.out.println("Import finalizat! Au fost salvate " + aedsToSave.size() + " defibrilatoare în baza de date.");
+            System.out.println(
+                    "Import finalizat! Au fost salvate " + aedsToSave.size() + " defibrilatoare în baza de date.");
         } else {
-            System.out.println("Baza de date are deja " + aedRepository.count() + " defibrilatoare. Sarim peste import.");
+            System.out
+                    .println("Baza de date are deja " + aedRepository.count() + " defibrilatoare. Sarim peste import.");
         }
     }
 }
