@@ -1,3 +1,4 @@
+# --- REGULI BACKEND  ---
 HELP.md
 target/
 .mvn/wrapper/maven-wrapper.jar
@@ -5,7 +6,13 @@ target/
 !**/src/test/**/target/
 *.jar
 *.war
-### STS ###
+
+### IDE Configs ###
+.idea
+.vscode/
+*.iws
+*.iml
+*.ipr
 .apt_generated
 .classpath
 .factorypath
@@ -14,13 +21,7 @@ target/
 .springBeans
 .sts4-cache
 
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-
-### NetBeans ###
+### NetBeans & Build ###
 /nbproject/private/
 /nbbuild/
 /dist/
@@ -30,11 +31,41 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-### VS Code ###
-.vscode/
+# --- REGULI FRONTEND  ---
+node_modules/
+.expo/
+dist/
+web-build/
+expo-env.d.ts
 
-### Sistem ###
+# Native & Security
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro & Debug
+.metro-health-check*
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# Sistem
 .DS_Store
 Thumbs.db
+*.pem
 
+# Local env
+.env*.local
+*.tsbuildinfo
+
+# Generated folders
+app-example
+/ios
+/android
+
+# Properties
 application.properties
