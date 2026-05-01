@@ -1,5 +1,7 @@
 package com.goldenminute.backend.model;
+
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "incidents")
@@ -12,24 +14,59 @@ public class Incident {
     private Double longitude;
     private String type;
     private String status;
+    private LocalDateTime createdAt;
 
     // Constructori
-    public Incident() {}
+    public Incident() {
+    }
 
-    public Incident(Double latitude, Double longitude, String type){
+    public Incident(Double latitude, Double longitude, String type) {
         this.latitude = latitude;
         this.longitude = longitude;
-        this.type = "CARDIAC_ARREST";
+        this.type = type;
         this.status = "ACTIVE";
+        this.createdAt = LocalDateTime.now();
     }
+
     // Getteri si Setteri
-    public Long getId() { return id; }
-    public Double getLatitude() { return latitude; }
-    public void setLatitude(Double latitude) { this.latitude = latitude; }
-    public Double getLongitude() { return longitude; }
-    public void setLongitude(Double longitude) { this.longitude = longitude; }
-    public String getType() { return type; }
-    public void setType(String type) { this.type = type; }
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public Long getId() {
+        return id;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
 }

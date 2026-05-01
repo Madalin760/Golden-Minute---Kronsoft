@@ -24,6 +24,6 @@ public class AedController {
             @RequestParam double lng,
             @RequestParam double radius) {
 
-        return aedRepository.findAedsWithinRadius(lat, lng, radius);
+        return aedRepository.findNearest(lat, lng, radius);
     }
 }

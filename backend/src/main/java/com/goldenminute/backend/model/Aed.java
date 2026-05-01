@@ -14,7 +14,16 @@ public class Aed {
     private String address;
     private double latitude;
     private double longitude;
+    
+    public Aed() {}
 
+    public Aed(String address, Double latitude, 
+               Double longitude, String name) {
+        this.address = address;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.name = name;
+    }
     //getters si setters
 
     public Long getId() { return id; }

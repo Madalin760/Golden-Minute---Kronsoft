@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 
 import com.goldenminute.backend.model.Volunteer;
 import com.goldenminute.backend.dto.VolunteerRegistrationRequest;
-import com.goldenminute.backend.repository.VolunteerRepository;
+//import com.goldenminute.backend.repository.VolunteerRepository;
 import com.goldenminute.backend.service.VolunteerService;
 
 @RestController
