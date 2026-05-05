@@ -20,6 +20,9 @@ public class IncidentService {
     @Autowired
     private AedService aedService;
 
+    @Autowired
+    private RoutingService routingService;
+
     public IncidentResponse createIncident(IncidentRequest request) {
 
         // 1. Salveaza incidentul
@@ -47,10 +50,11 @@ public class IncidentService {
             });
 
         CompletableFuture<String> routeFuture = CompletableFuture
-            .supplyAsync(() -> {
-                // Google Maps API — urmatorul pas
-                return "Ruta calculata — in asteptare Google Maps API";
-            });
+            .supplyAsync(() -> routingService.getOptimalRoute(
+                savedIncident.getLatitude(),
+                savedIncident.getLongitude(),
+                44.4559, 26.0970  // coordonate demo ambulanta
+        ));
 
         // 3. Asteapta toate 3 sa termine
         CompletableFuture.allOf(aedFuture, volunteerFuture, routeFuture).join();
