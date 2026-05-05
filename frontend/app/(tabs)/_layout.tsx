@@ -25,6 +25,13 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <Text style={{ color }}>📄</Text>,
         }}
       />
+      <Tabs.Screen
+      name="map"
+      options={{
+        title: 'Hartă',
+        tabBarIcon: ({ color }) => <Text style={{ color }}>🗺️</Text>,
+        }}
+/>
     </Tabs>
   );
 }
