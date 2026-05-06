@@ -4,14 +4,16 @@ public class NotificationRequest {
     private String token;
     private String title;
     private String body;
+    private Long incidentId;
 
     public NotificationRequest() {
     }
 
-    public NotificationRequest(String token, String title, String body) {
+    public NotificationRequest(String token, String title, String body, Long incidentId) {
         this.token = token;
         this.title = title;
         this.body = body;
+        this.incidentId = incidentId;
     }
 
     public String getToken() {
@@ -38,4 +40,11 @@ public class NotificationRequest {
         this.body = body;
     }
 
+    public Long getIncidentId() {
+        return incidentId;
+    }
+
+    public void setIncidentId(Long incidentId) {
+        this.incidentId = incidentId;
+    }
 }
