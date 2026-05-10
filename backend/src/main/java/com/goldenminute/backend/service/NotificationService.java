@@ -6,10 +6,12 @@ import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.goldenminute.backend.dto.NotificationRequest;
+import org.springframework.scheduling.annotation.Async;
 
 @Service
 public class NotificationService {
-    public String sendNotification(NotificationRequest request) {
+    @Async
+    public void sendPushNotification(NotificationRequest request) {
         try {
             Notification notification = Notification.builder()
                     .setTitle(request.getTitle())
@@ -19,12 +21,12 @@ public class NotificationService {
             Message message = Message.builder()
                     .setToken(request.getToken())
                     .setNotification(notification)
+                    .putData("incidentId", String.valueOf(request.getIncidentId()))
                     .build();
             String response = FirebaseMessaging.getInstance().send(message);
-            return response;
+            System.out.println("Succes trimitere FCM: " + response);
         } catch (FirebaseMessagingException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Failed to send notification", e);
+            System.err.println("Eroare FCM (token invalid sau alta problema): " + e.getMessage());
         }
     }
 }

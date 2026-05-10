@@ -19,8 +19,8 @@ public class NotificationController {
     @PostMapping("/send")
     public ResponseEntity<String> sendNotification(@RequestBody NotificationRequest request) {
         try {
-            String response = notificationService.sendNotification(request);
-            return ResponseEntity.ok(response);
+            notificationService.sendPushNotification(request);
+            return ResponseEntity.ok("Notificare trimisa cu succes!");
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to send notification");

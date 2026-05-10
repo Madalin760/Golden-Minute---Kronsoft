@@ -26,4 +26,13 @@ public class IncidentController {
     public String test() {
         return "GoldenMinute merge!";
     }
+
+    @PostMapping("/{incidentId}/accept")
+    public ResponseEntity<String> acceptIncident(@PathVariable Long incidentId, @RequestParam Long volunteerId) {
+        String mesaj = incidentService.acceptIncident(incidentId, volunteerId);
+        if (mesaj.contains("deja preluat")) {
+            return ResponseEntity.status(409).body(mesaj);
+        }
+        return ResponseEntity.ok(mesaj);
+    }
 }
