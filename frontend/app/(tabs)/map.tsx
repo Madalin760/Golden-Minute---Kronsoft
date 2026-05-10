@@ -1,2 +1,2 @@
-import MapScreen from '../../src/screens/MapScreen';
+import MapScreen from '../MapScreen';
 export default MapScreen;
