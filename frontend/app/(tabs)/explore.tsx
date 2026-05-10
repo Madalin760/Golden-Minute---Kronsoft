@@ -1,2 +1,2 @@
-import DocumentsScreen from '../../src/screens/DocumentsScreen';
+import DocumentsScreen from '../DocumentsScreen';
 export default DocumentsScreen;

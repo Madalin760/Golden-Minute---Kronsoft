@@ -19,19 +19,19 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="map"
+        options={{
+          title: 'Hartă',
+          tabBarIcon: ({ color }) => <Text style={{ color }}>🗺️</Text>,
+        }}
+      />
+      <Tabs.Screen
         name="explore"
         options={{
           title: 'Documente',
           tabBarIcon: ({ color }) => <Text style={{ color }}>📄</Text>,
         }}
       />
-      <Tabs.Screen
-      name="map"
-      options={{
-        title: 'Hartă',
-        tabBarIcon: ({ color }) => <Text style={{ color }}>🗺️</Text>,
-        }}
-/>
     </Tabs>
   );
 }

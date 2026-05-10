@@ -16,16 +16,32 @@ public class FirebaseConfig {
 
     @PostConstruct
     public void initFirebase() {
+        // Skip Firebase initialization if no real service account is configured
+        if (serviceAccountPath == null || serviceAccountPath.isBlank() || serviceAccountPath.equals("dummy")) {
+            System.out.println("[FirebaseConfig] WARNING: Firebase not configured (path='" + serviceAccountPath + "'). " +
+                    "Push notifications will be disabled. Set 'firebase.service-account.path' to enable.");
+            return;
+        }
+
+        ClassPathResource resource = new ClassPathResource(serviceAccountPath);
+        if (!resource.exists()) {
+            System.out.println("[FirebaseConfig] WARNING: Firebase service account file not found at '" +
+                    serviceAccountPath + "'. Push notifications will be disabled.");
+            return;
+        }
+
         try {
-            InputStream serviceAccount = new ClassPathResource(serviceAccountPath).getInputStream();
+            InputStream serviceAccount = resource.getInputStream();
             FirebaseOptions options = FirebaseOptions.builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount)).build();
             if (FirebaseApp.getApps().isEmpty()) {
                 FirebaseApp.initializeApp(options);
+                System.out.println("[FirebaseConfig] Firebase initialized successfully.");
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Failed to initialize Firebase", e);
+            // Log but don't crash — Firebase is optional during development
+            System.out.println("[FirebaseConfig] WARNING: Failed to initialize Firebase: " + e.getMessage() +
+                    ". Push notifications will be disabled.");
         }
     }
 }
