@@ -35,4 +35,8 @@ public class IncidentController {
         }
         return ResponseEntity.ok(mesaj);
     }
+    @GetMapping("/active")
+    public ResponseEntity<java.util.List<com.goldenminute.backend.model.Incident>> getActiveIncidents() {
+        return ResponseEntity.ok(incidentService.getActiveIncidents());
+    }
 }

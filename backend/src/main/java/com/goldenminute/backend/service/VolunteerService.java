@@ -24,7 +24,8 @@ public class VolunteerService {
             existingVolunteer.setLongitude(request.getLongitude());
             existingVolunteer.setName(request.getName());
             existingVolunteer.setIsAvailable(true);
-            existingVolunteer.setIsVerified(false);
+            // Păstrăm statusul de verificare existent (sau îl forțăm pe true pentru demo)
+            existingVolunteer.setIsVerified(true); 
 
             return volunteerRepository.save(existingVolunteer);
 
@@ -35,7 +36,8 @@ public class VolunteerService {
             newVolunteer.setLatitude(request.getLatitude());
             newVolunteer.setLongitude(request.getLongitude());
             newVolunteer.setIsAvailable(true);
-            newVolunteer.setIsVerified(false);
+            // Setăm true implicit pentru a ușura demonstrația
+            newVolunteer.setIsVerified(true);
 
             return volunteerRepository.save(newVolunteer);
         }

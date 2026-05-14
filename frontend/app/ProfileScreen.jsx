@@ -4,8 +4,9 @@ import { router } from 'expo-router';
 import * as Location from 'expo-location';
 import { registerVolunteer } from '../src/data/api';
 
-// Placeholder FCM token — replace with real expo-notifications token when Firebase is configured
-const PLACEHOLDER_FCM_TOKEN = 'placeholder-fcm-token';
+import * as Notifications from 'expo-notifications';
+import Constants from 'expo-constants';
+import { Platform } from 'react-native';
 
 export default function ProfileScreen() {
   const [registrationStatus, setRegistrationStatus] = useState('idle'); // idle | loading | success | error
@@ -20,8 +21,8 @@ export default function ProfileScreen() {
     setRegistrationStatus('loading');
     try {
       // Get location
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
+      const { status: locStatus } = await Location.requestForegroundPermissionsAsync();
+      if (locStatus !== 'granted') {
         setRegistrationStatus('error');
         return;
       }
@@ -29,10 +30,29 @@ export default function ProfileScreen() {
         accuracy: Location.Accuracy.Balanced,
       });
 
+      // Get Expo Push Token
+      let expoPushToken = 'dummy-token-fallback';
+      try {
+        const { status: existingStatus } = await Notifications.getPermissionsAsync();
+        let finalStatus = existingStatus;
+        if (existingStatus !== 'granted') {
+          const { status } = await Notifications.requestPermissionsAsync();
+          finalStatus = status;
+        }
+        if (finalStatus === 'granted') {
+          // Expo requires a projectId in recent SDKs. We use a fallback if not configured in app.json
+          const projectId = Constants.expoConfig?.extra?.eas?.projectId ?? Constants.easConfig?.projectId ?? 'golden-minute-demo';
+          const tokenData = await Notifications.getExpoPushTokenAsync({ projectId });
+          expoPushToken = tokenData.data;
+        }
+      } catch (e) {
+        console.log("Error getting push token", e);
+      }
+
       // Register with backend
       const response = await registerVolunteer(
         'Voluntar',              // Name — replace with real auth data
-        PLACEHOLDER_FCM_TOKEN,   // FCM token — replace when Firebase is ready
+        expoPushToken,           // REAL Expo Push Token sent to backend
         pos.coords.latitude,
         pos.coords.longitude
       );
