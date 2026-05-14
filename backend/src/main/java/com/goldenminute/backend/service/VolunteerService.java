@@ -17,15 +17,25 @@ public class VolunteerService {
     }
 
     public Volunteer registerVolunteer(VolunteerRegistrationRequest request) {
-        Optional<Volunteer> volunteer = volunteerRepository.findByFcmToken(request.getFcmToken());
+        // Prioritizăm căutarea după userId (dacă avem un user logat)
+        Optional<Volunteer> volunteer = Optional.empty();
+        if (request.getUserId() != null) {
+            volunteer = volunteerRepository.findByUserId(request.getUserId());
+        }
+        if (volunteer.isEmpty()) {
+            volunteer = volunteerRepository.findByFcmToken(request.getFcmToken());
+        }
+
         if (volunteer.isPresent()) {
             Volunteer existingVolunteer = volunteer.get();
             existingVolunteer.setLatitude(request.getLatitude());
             existingVolunteer.setLongitude(request.getLongitude());
             existingVolunteer.setName(request.getName());
+            existingVolunteer.setFcmToken(request.getFcmToken());
             existingVolunteer.setIsAvailable(true);
-            // Păstrăm statusul de verificare existent (sau îl forțăm pe true pentru demo)
-            existingVolunteer.setIsVerified(true); 
+            if (request.getUserId() != null) {
+                existingVolunteer.setUserId(request.getUserId());
+            }
 
             return volunteerRepository.save(existingVolunteer);
 
@@ -36,11 +46,10 @@ public class VolunteerService {
             newVolunteer.setLatitude(request.getLatitude());
             newVolunteer.setLongitude(request.getLongitude());
             newVolunteer.setIsAvailable(true);
-            // Setăm true implicit pentru a ușura demonstrația
-            newVolunteer.setIsVerified(true);
+            newVolunteer.setIsVerified(false);
+            newVolunteer.setUserId(request.getUserId());
 
             return volunteerRepository.save(newVolunteer);
         }
-
     }
 }

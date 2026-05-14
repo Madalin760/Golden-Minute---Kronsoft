@@ -11,6 +11,14 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
+// ─── AUTH ───────────────────────────────────────────────────────────────────
+
+export const registerUser = (name, email, password, phone) =>
+  api.post('/api/auth/register', { name, email, password, phone });
+
+export const loginUser = (email, password) =>
+  api.post('/api/auth/login', { email, password });
+
 // ─── AED ───────────────────────────────────────────────────────────────────
 
 /**
@@ -59,12 +67,13 @@ export const acceptIncident = (incidentId, volunteerId) =>
  * Body: { name, fcmToken, latitude, longitude }
  * Returns: Volunteer entity
  */
-export const registerVolunteer = (name, fcmToken, lat, lng) =>
+export const registerVolunteer = (name, fcmToken, lat, lng, userId = null) =>
   api.post('/api/volunteers/register', {
     name,
     fcmToken,
     latitude: lat,
     longitude: lng,
+    userId,
   });
 
 // ─── NOTIFICATIONS ─────────────────────────────────────────────────────────

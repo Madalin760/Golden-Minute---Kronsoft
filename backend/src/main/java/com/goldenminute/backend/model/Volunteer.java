@@ -23,5 +23,6 @@ public class Volunteer {
     private Double longitude;
     private Boolean isAvailable;
     private Boolean isVerified;
+    private Long userId;
 
 }

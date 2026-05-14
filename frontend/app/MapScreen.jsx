@@ -7,6 +7,7 @@ import MapView, { Marker, Callout, Circle, Polyline } from 'react-native-maps';
 import * as Location from 'expo-location';
 import * as Notifications from 'expo-notifications';
 import { getAedsNearby, createIncident, getActiveIncidents, acceptIncident } from '../src/data/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -32,6 +33,7 @@ export default function MapScreen() {
   const [acceptedIncident, setAcceptedIncident] = useState(null);
   const [acceptLoading, setAcceptLoading] = useState(false);
   const [volunteerId, setVolunteerId] = useState(null);
+  const myIncidentIds = useRef(new Set()); // IDs ale incidentelor create de MINE (ca să nu primesc propria alertă)
 
   // 1. Location
   useEffect(() => {
@@ -55,7 +57,7 @@ export default function MapScreen() {
         const list = res.data;
         if (list && list.length > 0) {
           const latest = list[list.length - 1];
-          if (latest && lastIncidentId !== latest.id) {
+          if (latest && lastIncidentId !== latest.id && !myIncidentIds.current.has(latest.id)) {
             lastIncidentId = latest.id;
             await Notifications.scheduleNotificationAsync({
               content: { title: "🚨 URGENȚĂ MEDICALĂ!", body: "Un pacient are nevoie de ajutor!", data: { incidentId: latest.id }, sound: true },
@@ -86,15 +88,15 @@ export default function MapScreen() {
     }
   }, [showAlertModal]);
 
-  // Get volunteerId from profile registration
+  // Get volunteerId from AsyncStorage (set by ProfileScreen)
   useEffect(() => {
-    const fetchVol = async () => {
+    const loadVolunteerId = async () => {
       try {
-        const res = await getActiveIncidents(); // just to test connectivity
-        // We'll use volunteerId=1 as fallback for demo
+        const volId = await AsyncStorage.getItem('volunteerId');
+        if (volId) setVolunteerId(parseInt(volId, 10));
       } catch(e) {}
     };
-    fetchVol();
+    loadVolunteerId();
   }, []);
 
   const fetchAeds = async (lat, lng) => {
@@ -111,7 +113,7 @@ export default function MapScreen() {
     setAcceptLoading(true);
     try {
       // Use volunteer ID from DB (fallback to latest)
-      const volId = volunteerId || 4;
+      const volId = volunteerId || 1;
       await acceptIncident(pendingIncident.id, volId);
       setAcceptedIncident(pendingIncident);
       setShowAlertModal(false);
@@ -152,6 +154,11 @@ export default function MapScreen() {
     try {
       const response = await createIncident(location.latitude, location.longitude, 'CARDIAC_ARREST');
       const data = response.data;
+
+      // Salvăm ID-ul incidentului creat de noi ca să nu ne alertăm pe noi înșine
+      if (data.incident?.id) {
+        myIncidentIds.current.add(data.incident.id);
+      }
       Alert.alert('✅ SOS Trimis',
         `${data.message || 'Voluntarii au fost alertați!'}\n\nAED-uri găsite: ${data.nearbyAeds?.length || 0}\nStatus voluntari: ${data.volunteerStatus || 'Se procesează...'}`
       );

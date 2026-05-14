@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface VolunteerRepository extends JpaRepository<Volunteer, Long> {
     Optional<Volunteer> findByFcmToken(String fcmToken);
+    Optional<Volunteer> findByUserId(Long userId);
 
     @Query(value = "SELECT * FROM volunteers v " +
             "WHERE v.is_available = true " +

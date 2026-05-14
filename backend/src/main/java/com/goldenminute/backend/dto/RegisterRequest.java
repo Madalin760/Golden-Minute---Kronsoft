@@ -7,11 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class VolunteerRegistrationRequest {
+public class RegisterRequest {
+    private String email;
+    private String password;
     private String name;
-    private String fcmToken;
-    private Double latitude;
-    private Double longitude;
-    private Long userId;
-
+    private String phone;
 }
