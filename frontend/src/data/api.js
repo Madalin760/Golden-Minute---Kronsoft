@@ -50,11 +50,11 @@ export const getAedsNearby = (lat, lng, radius = 5000) =>
 /**
  * Create a new emergency incident (SOS).
  * POST /api/incidents
- * Body: { latitude, longitude, type }
+ * Body: { latitude, longitude, type, reporterId }
  * Returns: { incident, nearbyAeds, volunteerStatus, routeStatus, message }
  */
-export const createIncident = (lat, lng, type = 'CARDIAC_ARREST') =>
-  api.post('/api/incidents', { latitude: lat, longitude: lng, type });
+export const createIncident = (lat, lng, type = 'CARDIAC_ARREST', reporterId = null) =>
+  api.post('/api/incidents', { latitude: lat, longitude: lng, type, reporterId });
 
 /**
  * Health check.

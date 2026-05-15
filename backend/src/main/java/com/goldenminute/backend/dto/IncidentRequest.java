@@ -4,6 +4,7 @@ public class IncidentRequest {
     private Double latitude;
     private Double longitude;
     private String type;
+    private Long reporterId;
 
     public Double getLatitude()
     {
@@ -29,7 +30,10 @@ public class IncidentRequest {
     {
         this.type = type;
     }
-    
-    
-    
+    public Long getReporterId() {
+        return reporterId;
+    }
+    public void setReporterId(Long reporterId) {
+        this.reporterId = reporterId;
+    }
 }

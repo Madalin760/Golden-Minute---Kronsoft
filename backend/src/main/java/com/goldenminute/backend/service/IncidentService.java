@@ -61,6 +61,9 @@ public class IncidentService {
                     List<Volunteer> topVolunteers = volunteerRepository.findTop5Volunteers(savedIncident.getLatitude(),
                             savedIncident.getLongitude());
                     for (Volunteer volunteer : topVolunteers) {
+                        if (request.getReporterId() != null && request.getReporterId().equals(volunteer.getId())) {
+                            continue; // Skip notifying the user who created the incident
+                        }
                         notifyVolunteer(volunteer, savedIncident);
                     }
                     return "Voluntari alertati — in asteptare Firebase";
@@ -105,33 +108,53 @@ public class IncidentService {
     public String acceptIncident(Long incidentId, Long volunteerId) {
         Incident incident = incidentRepository.findById(incidentId)
                 .orElseThrow(() -> new RuntimeException("Incident not found"));
-        if (!"ACTIVE".equals(incident.getStatus())) {
-            return "Incidentul a fost deja preluat de altcineva!";
+
+        List<IncidentDispatch> acceptedDispatches = incidentDispatchRepository.findByIncidentIdAndStatus(incidentId,
+                IncidentDispatch.DispatchStatus.ACCEPTED);
+
+        if (acceptedDispatches.size() >= 2) {
+            return "Incidentul a fost deja preluat de numărul maxim de voluntari (2)!";
         }
-        incident.setStatus("ASSIGNED");
-        incidentRepository.save(incident);
+
+        boolean alreadyAccepted = acceptedDispatches.stream().anyMatch(d -> d.getVolunteer().getId().equals(volunteerId));
+        if (alreadyAccepted) {
+            return "Acest incident a fost deja preluat de tine!";
+        }
 
         IncidentDispatch incidentDispatch = incidentDispatchRepository
                 .findByIncidentIdAndVolunteerId(incidentId, volunteerId)
-                .orElseThrow(() -> new RuntimeException("Dispatch not found"));
+                .orElseGet(() -> {
+                    IncidentDispatch newDispatch = new IncidentDispatch();
+                    newDispatch.setIncident(incident);
+                    Volunteer volunteer = volunteerRepository.findById(volunteerId)
+                            .orElseThrow(() -> new RuntimeException("Volunteer not found"));
+                    newDispatch.setVolunteer(volunteer);
+                    newDispatch.setSentAt(java.time.LocalDateTime.now());
+                    return newDispatch;
+                });
         incidentDispatch.setStatus(IncidentDispatch.DispatchStatus.ACCEPTED);
         incidentDispatch.setRespondedAt(java.time.LocalDateTime.now());
         incidentDispatchRepository.save(incidentDispatch);
 
-        List<IncidentDispatch> pendingDispatches = incidentDispatchRepository.findByIncidentIdAndStatus(incidentId,
-                IncidentDispatch.DispatchStatus.PENDING);
-        for (IncidentDispatch dispatch : pendingDispatches) {
-            dispatch.setStatus(IncidentDispatch.DispatchStatus.CANCELED);
+        int newCount = acceptedDispatches.size() + 1;
 
-            dispatch.setRespondedAt(java.time.LocalDateTime.now());
+        if (newCount >= 2) {
+            incident.setStatus("ASSIGNED");
+            incidentRepository.save(incident);
 
-            incidentDispatchRepository.save(dispatch);
+            List<IncidentDispatch> pendingDispatches = incidentDispatchRepository.findByIncidentIdAndStatus(incidentId,
+                    IncidentDispatch.DispatchStatus.PENDING);
+            for (IncidentDispatch dispatch : pendingDispatches) {
+                dispatch.setStatus(IncidentDispatch.DispatchStatus.CANCELED);
+                dispatch.setRespondedAt(java.time.LocalDateTime.now());
+                incidentDispatchRepository.save(dispatch);
 
-            NotificationRequest cancelRequest = new NotificationRequest(dispatch.getVolunteer().getFcmToken(),
-                    "Misiune preluata", "Un alt voluntar a fost mai rapid si a preluat incidentul. Iti multumim!",
-                    incidentId);
+                NotificationRequest cancelRequest = new NotificationRequest(dispatch.getVolunteer().getFcmToken(),
+                        "Misiune preluată complet", "Au fost deja alocați 2 voluntari pentru acest incident. Îți mulțumim!",
+                        incidentId);
 
-            notificationService.sendPushNotification(cancelRequest);
+                notificationService.sendPushNotification(cancelRequest);
+            }
         }
 
         return "Ai acceptat incidentul! Drum bun!";

@@ -37,15 +37,33 @@ export default function MapScreen() {
 
   // 1. Location
   useEffect(() => {
+    let locationSubscription = null;
+
     (async () => {
       try {
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== 'granted') { setError('Permisiunea de localizare a fost refuzată.'); setLoading(false); return; }
+        
+        // Prima localizare
         const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
         setLocation(pos.coords);
         fetchAeds(pos.coords.latitude, pos.coords.longitude);
+
+        // Urmărim continuu locația
+        locationSubscription = await Location.watchPositionAsync(
+          { accuracy: Location.Accuracy.High, timeInterval: 5000, distanceInterval: 10 },
+          (newPos) => {
+            setLocation(newPos.coords);
+          }
+        );
       } catch (err) { setError('Nu s-a putut obține localizarea.'); setLoading(false); }
     })();
+
+    return () => {
+      if (locationSubscription) {
+        locationSubscription.remove();
+      }
+    };
   }, []);
 
   // 1b. Polling for active incidents
@@ -152,7 +170,7 @@ export default function MapScreen() {
   const submitSOS = async () => {
     setSosLoading(true);
     try {
-      const response = await createIncident(location.latitude, location.longitude, 'CARDIAC_ARREST');
+      const response = await createIncident(location.latitude, location.longitude, 'CARDIAC_ARREST', volunteerId);
       const data = response.data;
 
       // Salvăm ID-ul incidentului creat de noi ca să nu ne alertăm pe noi înșine
