@@ -1,15 +1,23 @@
 import axios from 'axios';
 
 // Use your PC's local network IP so Expo Go on a physical device can reach the backend.
-// Your PC is at 192.168.0.32 on the local network.
+// Your PC is at 192.168.1.226 on the local network.
 // Make sure your phone is on the same WiFi as your PC.
-const BASE_URL = 'http://192.168.0.32:8081';
+const BASE_URL = 'http://192.168.1.225:8081';
 
 const api = axios.create({
   baseURL: BASE_URL,
   timeout: 10000,
   headers: { 'Content-Type': 'application/json' },
 });
+
+// ─── AUTH ───────────────────────────────────────────────────────────────────
+
+export const registerUser = (name, email, password, phone) =>
+  api.post('/api/auth/register', { name, email, password, phone });
+
+export const loginUser = (email, password) =>
+  api.post('/api/auth/login', { email, password });
 
 // ─── AED ───────────────────────────────────────────────────────────────────
 
@@ -38,6 +46,19 @@ export const createIncident = (lat, lng, type = 'CARDIAC_ARREST') =>
  */
 export const testBackend = () => api.get('/api/incidents/test');
 
+/**
+ * Get all active incidents (for local notification polling)
+ * GET /api/incidents/active
+ */
+export const getActiveIncidents = () => api.get('/api/incidents/active');
+
+/**
+ * Accept an incident as a volunteer.
+ * POST /api/incidents/{incidentId}/accept?volunteerId=X
+ */
+export const acceptIncident = (incidentId, volunteerId) =>
+  api.post(`/api/incidents/${incidentId}/accept?volunteerId=${volunteerId}`);
+
 // ─── VOLUNTEERS ────────────────────────────────────────────────────────────
 
 /**
@@ -46,12 +67,13 @@ export const testBackend = () => api.get('/api/incidents/test');
  * Body: { name, fcmToken, latitude, longitude }
  * Returns: Volunteer entity
  */
-export const registerVolunteer = (name, fcmToken, lat, lng) =>
+export const registerVolunteer = (name, fcmToken, lat, lng, userId = null) =>
   api.post('/api/volunteers/register', {
     name,
     fcmToken,
     latitude: lat,
     longitude: lng,
+    userId,
   });
 
 // ─── NOTIFICATIONS ─────────────────────────────────────────────────────────

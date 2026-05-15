@@ -136,4 +136,7 @@ public class IncidentService {
 
         return "Ai acceptat incidentul! Drum bun!";
     }
+    public List<Incident> getActiveIncidents() {
+        return incidentRepository.findByStatus("ACTIVE");
+    }
 }
