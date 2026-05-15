@@ -68,7 +68,7 @@ export default function MapScreen() {
             Vibration.vibrate([0, 500, 200, 500]);
           }
         }
-      } catch (err) {}
+      } catch (err) { }
     };
     const id = setInterval(check, 3000);
     return () => clearInterval(id);
@@ -94,7 +94,7 @@ export default function MapScreen() {
       try {
         const volId = await AsyncStorage.getItem('volunteerId');
         if (volId) setVolunteerId(parseInt(volId, 10));
-      } catch(e) {}
+      } catch (e) { }
     };
     loadVolunteerId();
   }, []);
@@ -178,12 +178,12 @@ export default function MapScreen() {
     const R = 6371000;
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   };
 
   if (loading) return (<View style={s.centered}><ActivityIndicator size="large" color="#D32F2F" /><Text style={s.loadingText}>Se încarcă harta...</Text></View>);
-  if (error) return (<View style={s.centered}><Text style={{fontSize:48,marginBottom:16}}>📍</Text><Text style={{fontSize:20,fontWeight:'bold',color:'#333'}}>Localizare indisponibilă</Text><Text style={{fontSize:14,color:'#999',textAlign:'center'}}>{error}</Text></View>);
+  if (error) return (<View style={s.centered}><Text style={{ fontSize: 48, marginBottom: 16 }}>📍</Text><Text style={{ fontSize: 20, fontWeight: 'bold', color: '#333' }}>Localizare indisponibilă</Text><Text style={{ fontSize: 14, color: '#999', textAlign: 'center' }}>{error}</Text></View>);
 
   const initialRegion = location
     ? { latitude: location.latitude, longitude: location.longitude, latitudeDelta: 0.04, longitudeDelta: 0.04 }
@@ -199,30 +199,30 @@ export default function MapScreen() {
       <View style={s.statusBar}>
         <View style={[s.statusDot, { backgroundColor: backendOnline ? '#4CAF50' : '#FF5722' }]} />
         <Text style={s.statusText}>
-          {backendOnline === null ? 'Se conectează...' : backendOnline ? `${aeds.length} AED-uri în ${AED_SEARCH_RADIUS/1000}km rază` : 'Backend offline — hartă locală'}
+          {backendOnline === null ? 'Se conectează...' : backendOnline ? `${aeds.length} AED-uri în ${AED_SEARCH_RADIUS / 1000}km rază` : 'Backend offline — hartă locală'}
         </Text>
       </View>
 
       {/* Map */}
       <MapView ref={mapRef} style={s.map} initialRegion={initialRegion} showsUserLocation showsMyLocationButton={false} showsCompass showsScale>
-        {location && <Circle center={{latitude: location.latitude, longitude: location.longitude}} radius={AED_SEARCH_RADIUS} strokeColor="rgba(211,47,47,0.3)" fillColor="rgba(211,47,47,0.05)" />}
+        {location && <Circle center={{ latitude: location.latitude, longitude: location.longitude }} radius={AED_SEARCH_RADIUS} strokeColor="rgba(211,47,47,0.3)" fillColor="rgba(211,47,47,0.05)" />}
         {aeds.map((aed) => (
-          <Marker key={aed.id} coordinate={{latitude: aed.latitude, longitude: aed.longitude}} title={aed.name} description={aed.address}>
-            <View style={s.aedMarker}><Text style={{fontSize:18}}>🫀</Text></View>
+          <Marker key={aed.id} coordinate={{ latitude: aed.latitude, longitude: aed.longitude }} title={aed.name} description={aed.address}>
+            <View style={s.aedMarker}><Text style={{ fontSize: 18 }}>🫀</Text></View>
             <Callout tooltip><View style={s.callout}><Text style={s.calloutTitle}>{aed.name || 'AED'}</Text><Text style={s.calloutAddr}>{aed.address || 'Adresă indisponibilă'}</Text><View style={s.calloutBadge}><Text style={s.calloutBadgeText}>⚡ Disponibil</Text></View></View></Callout>
           </Marker>
         ))}
         {/* Accepted incident marker + route line */}
         {acceptedIncident && (
           <>
-            <Marker coordinate={{latitude: acceptedIncident.latitude, longitude: acceptedIncident.longitude}} title="🚨 Pacient" description="Urgență medicală">
-              <View style={s.incidentMarker}><Text style={{fontSize: 24}}>🆘</Text></View>
+            <Marker coordinate={{ latitude: acceptedIncident.latitude, longitude: acceptedIncident.longitude }} title="🚨 Pacient" description="Urgență medicală">
+              <View style={s.incidentMarker}><Text style={{ fontSize: 24 }}>🆘</Text></View>
             </Marker>
             {location && (
               <Polyline
                 coordinates={[
-                  {latitude: location.latitude, longitude: location.longitude},
-                  {latitude: acceptedIncident.latitude, longitude: acceptedIncident.longitude},
+                  { latitude: location.latitude, longitude: location.longitude },
+                  { latitude: acceptedIncident.latitude, longitude: acceptedIncident.longitude },
                 ]}
                 strokeColor="#D32F2F"
                 strokeWidth={4}
@@ -236,10 +236,10 @@ export default function MapScreen() {
       {/* Navigation info bar (after accepting) */}
       {acceptedIncident && (
         <View style={s.navBar}>
-          <View style={s.navIconWrap}><Text style={{fontSize: 28}}>🏃‍♂️</Text></View>
-          <View style={{flex:1}}>
+          <View style={s.navIconWrap}><Text style={{ fontSize: 28 }}>🏃‍♂️</Text></View>
+          <View style={{ flex: 1 }}>
             <Text style={s.navTitle}>Navigare către pacient</Text>
-            <Text style={s.navSubtitle}>{distToIncident ? `${distToIncident < 1000 ? distToIncident + ' m' : (distToIncident/1000).toFixed(1) + ' km'} distanță` : 'Se calculează...'} · Urgență cardiacă</Text>
+            <Text style={s.navSubtitle}>{distToIncident ? `${distToIncident < 1000 ? distToIncident + ' m' : (distToIncident / 1000).toFixed(1) + ' km'} distanță` : 'Se calculează...'} · Urgență cardiacă</Text>
           </View>
           <TouchableOpacity style={s.navEndBtn} onPress={() => { setAcceptedIncident(null); Alert.alert('✅ Misiune finalizată', 'Mulțumim pentru intervenție!'); }}>
             <Text style={s.navEndText}>Finalizează</Text>
@@ -248,8 +248,8 @@ export default function MapScreen() {
       )}
 
       {/* Center + Refresh buttons */}
-      <TouchableOpacity style={s.centerButton} onPress={centerOnUser}><Text style={{fontSize:22}}>📍</Text></TouchableOpacity>
-      <TouchableOpacity style={s.refreshButton} onPress={() => location && fetchAeds(location.latitude, location.longitude)}><Text style={{fontSize:22}}>🔄</Text></TouchableOpacity>
+      <TouchableOpacity style={s.centerButton} onPress={centerOnUser}><Text style={{ fontSize: 22 }}>📍</Text></TouchableOpacity>
+      <TouchableOpacity style={s.refreshButton} onPress={() => location && fetchAeds(location.latitude, location.longitude)}><Text style={{ fontSize: 22 }}>🔄</Text></TouchableOpacity>
 
       {/* SOS button (hide when navigating) */}
       {!acceptedIncident && (
@@ -266,8 +266,8 @@ export default function MapScreen() {
       <Modal visible={showAlertModal} transparent animationType="fade">
         <View style={s.modalOverlay}>
           <View style={s.modalCard}>
-            <Animated.View style={[s.pulseCircle, {transform:[{scale:pulseAnim}]}]}>
-              <Text style={{fontSize: 48}}>🚨</Text>
+            <Animated.View style={[s.pulseCircle, { transform: [{ scale: pulseAnim }] }]}>
+              <Text style={{ fontSize: 48 }}>🚨</Text>
             </Animated.View>
             <Text style={s.modalTitle}>URGENȚĂ MEDICALĂ!</Text>
             <Text style={s.modalSubtitle}>Un pacient are nevoie de ajutor în apropierea ta</Text>

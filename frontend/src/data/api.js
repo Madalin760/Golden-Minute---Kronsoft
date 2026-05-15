@@ -1,9 +1,25 @@
 import axios from 'axios';
+import Constants from 'expo-constants';
 
-// Use your PC's local network IP so Expo Go on a physical device can reach the backend.
-// Your PC is at 192.168.1.226 on the local network.
-// Make sure your phone is on the same WiFi as your PC.
-const BASE_URL = 'http://192.168.1.225:8081';
+// Automatically get the IP address of the machine running the Expo packager
+const getBaseUrl = () => {
+  if (!__DEV__) {
+    // Put your production URL here when you deploy
+    return 'https://your-production-backend.com';
+  }
+  
+  const debuggerHost = Constants.expoConfig?.hostUri;
+  if (debuggerHost) {
+    // debuggerHost looks like "192.168.1.225:8081"
+    const ip = debuggerHost.split(':')[0];
+    return `http://${ip}:8080`;
+  }
+  
+  // Fallback
+  return 'http://localhost:8080';
+};
+
+const BASE_URL = getBaseUrl();
 
 const api = axios.create({
   baseURL: BASE_URL,
