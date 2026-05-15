@@ -1,12 +1,11 @@
-package com.goldenminute.backend;
+package com.goldenminute.backend.model;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.goldenminute.backend.model.Aed;
-import com.goldenminute.backend.repository.AedRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
+import com.goldenminute.backend.repository.AedRepository;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -24,7 +23,7 @@ public class DataLoader implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        aedRepository.deleteAll();
+        //aedRepository.deleteAll();
 
         if (aedRepository.count() == 0) {
             System.out.println("Baza de date este goala. Incepem importul fișierului aeds_oficial.json...");
